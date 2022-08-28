@@ -1,0 +1,103 @@
+---
+title: "Tarea 1 Modelos de Supervivencia y Series de Tiempo"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+  html_notebook: default
+---
+
+## - Una serie de tiempo se puede descomponer en los siguientes componentes.(Seleccione la opción correcta)
+
+## \textcolor{blue}{Solución:}
+1. Tendencia, Estacionariedad y Parte Aleatoria
+2. Parte Aditiva y Parte Multiplicativa
+3. \textcolor{red}{Tendencia, Estacionalidad y Parte Aleatoria}
+
+## - ¿Cuáles son las razones por las que se sugiere aplicar transformaciones como suavizamiento a través de medias móviles o diferenciación a las series de tiempo?
+
+## \textcolor{blue}{Solución:}
+
+1. La mayoría de las series de tiempo no son débilmente estacionarias, es decir que no muestran una media ni una varianza constantes a lo largo del tiempo y pueden mostrar tendencias crecientes o bien, decrecientes. Para poder trabajar con este tipo de series de una forma más sencilla y manejable, existen métodos para transformarlas y verlas como realizaciones de una serie de tiempo débilmente estacionaria. Las transformaciones más comunes son el suavizamiento a través de medias móviles o ajustando polinomios a la serie en cuestión, la diferenciación.
+
+## - Un conjunto de 144 medidas del número de pasajeros mensuales en líneas aereas están en el objeto AirPassengers.
+
+## \textcolor{blue}{Solución:}
+
+1. ### Grafique la serie de tiempo. ¿Que patrón se observa?/ 
+
+## \textcolor{blue}{Solución:}
+Primero carguemos los datos:
+```{r dataAirP}
+library(ggfortify)
+library(tseries)
+library(forecast)
+
+data(AirPassengers)
+AirP <- AirPassengers
+```
+Ahora procedamos a graficar nuestros datos, justo como se muestra a continuación: 
+```{r graphAirP}
+plot(AirP,xlab="Date", ylab = "Passenger numbers",main="Air Passenger")
+```
+\
+En esta gráfica ponemos notar que no vemos algún comportamiento estacional, por lo cuál no podemos decir si en algún tiempo dado hay alguna tendencia en el número de pasajeros; pero también se puede notar que a lo largo del tiempo se ha aumentado el número de pasajeros de los cuáles se tiene registro. De esta manera puedo percibir que no se tiene varianza y tendencia constante. 
+
+2. ### Grafique la serie de los logaritmos de los datos. ¿Qué cambio observa?
+
+## \textcolor{blue}{Solución:}
+
+Para este caso haré uso de plot, de este modo optenemos:
+```{r AirPLog}
+AirPLog = log(AirP)
+plot(AirPLog,xlab="Date", ylab = "Passenger numbers",main="Air Passenger")
+```
+A diferencia de la gráfica del inciso anterior, aquí puedo apreciar una mejor una varianza y tendencia constante, por cuál podría decir que esta tranformación nos da una serie estacionaria.
+
+3. ### Grafique la serie de las diferencias de los logaritmos de los datos. ¿El gráfico sugiere que un modelo estacionario podría ser apropiado para las diferencias de los logaritmos? Explique brevemente
+
+## \textcolor{blue}{Solución:}
+
+Primero veamos que la diferencia de logaritmos de los datos podemos expresarla como: 
+$$diff(logX)=logX_{t} - logX_{t-1}$$
+de esta forma grafiquemos la serie de las diferencias de los logaritmos de los datos:
+```{r AirPDiff}
+plot(diff(AirPLog))
+```
+Como se puede apreciar en la gráfica obtenida, ahora obtenemos una serie estacionaria, es decir, se mantiene una varianza constante al igual que la media; por lo cual podemos intuir que en este caso es apropiado para la diferencia de logaritmos. 
+
+## El precio diario de oro durante 252 días de trading en 2005 están en el objeto gold del paquete TSA.
+
+1. ### Grafique la serie de tiempo. ¿Qué patrón se observa?
+
+## \textcolor{blue}{Solución:}
+Primero carguemos los datos:
+```{r goldData}
+data(gold)
+goldPrice <- gold
+```
+Ahora procedamos a graficar nuestros datos, justo como se muestra a continuación: 
+```{r goldPlot}
+plot(goldPrice,xlab="Trading Days", ylab = "Gold Price",main="Gold Price")
+```
+Podemos notar en la gráfica anterior que no se tiene una varianza y media no constantes, es decir, no es estacionaria, de igual forma se ve que no tiene tendencia constante. 
+
+2. ### Grafique la serie de las diferencias de los logaritmos de los datos. ¿El gráfico sugiere que un modelo estacionario podría ser apropiado para las diferencias de los logaritmos? Explique brevemente.
+
+## \textcolor{blue}{Solución:}
+```{r goldLog}
+goldLog <- log(goldPrice)
+# gráfica de diferencia
+plot(diff(goldLog))
+```
+Como se puede apreciar en la gráfica obtenida, ahora obtenemos una serie estacionaria (aproximadamente), es decir, se mantiene una varianza aproximadamente constante al igual que la media; por lo cual podemos intuir que en este caso es apropiado para la diferencia de logaritmos. 
+
+3. ### Utilice la función ACF para las diferencias de los logaritmos de los datos. ¿Es evidencia suficiente de que los log-precios del oro siguen un modelo de caminata aleatoria?, ¿por qué?
+
+## \textcolor{blue}{Solución:}
+
+```{r goldACF}
+acf(goldLog, lag.max = 70, na.action = na.pass)
+```
+Veamos en nuestra gráfica del inciso anterior no podemos ver claramente un patrón en nuestra serie, por lo cual podemos intuir que de esta manera tenemos una serie "White Noise". Ahora en la gráfica de este inciso tenemos que los valores del eje Y (ACF) nos indica que los posibles valores para la ACF los cuáles varían entre -1 a 1, estás líneas verticales graficadas las cuales indican que los coeficientes de correlación son significantes que es un factor importante a considerar de la dependencia en los datos. 
+Dicho lo anterior podemos decir que se trata de una caminata aleatoria.
